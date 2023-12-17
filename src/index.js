@@ -55,22 +55,21 @@ function extractHWIDFromURL(url) {
 }
 
 client.on("interactionCreate", async (interaction) => {
-	const allowedChannelIds = ['1174298298778132490', '1184794382554103848']; // Thay YOUR_SECOND_CHANNEL_ID bằng ID của kênh thứ hai
-  
-	if (!interaction.guild) {
-	  await interaction.reply("Chỉ được sử dụng lệnh trong server. [Click vào đây để được vào server!](https://discord.gg/hngaming)");
-	  return;
-	}
-  
-	if (!allowedChannelIds.includes(interaction.channelId)) {
-	  const allowedChannels = allowedChannelIds.map(id => `<#${id}>`).join(' hoặc ');
-	  const replyMessage = await interaction.reply(`Chỉ được dùng lệnh trong ${allowedChannels}.`);
-  
-	  setTimeout(async () => {
-		await replyMessage.delete();
-	  }, 3000);
-	  return;
-	}
+	const allowedChannelId = '1174298298778132490';
+		if (!interaction.guild) {
+			await interaction.reply("Chỉ được sử dụng lệnh trong server. [Click vào đây để được vào server!](https://discord.gg/hngaming)");
+			return;
+			}
+        if (interaction.channelId !== allowedChannelId) {
+    const allowedChannel = interaction.guild.channels.cache.get(allowedChannelId);
+    const channelLink = allowedChannel ? `<#${allowedChannel.id}>` : `channel ${allowedChannelId}`;
+    const replyMessage = await interaction.reply(`Chỉ được dùng lệnh trong ${channelLink}.`);
+
+    setTimeout(async () => {
+      await replyMessage.delete();
+    }, 3000); 
+    return;
+  }
 
 		if (!interaction.isChatInputCommand()) return;
 
@@ -96,13 +95,14 @@ client.on("interactionCreate", async (interaction) => {
 		);
 
 		await interaction.editReply({ embeds: [embed] });
-	} catch (error) {
-		const errorMessage = await interaction.editReply("Vui lòng thử lại.");
-		console.log(error);
-		setTimeout(async () => {
-			await errorMessage.delete();
-		}, 3000);
-	}
+		} catch (error) {
+			const errorMessage = await interaction.editReply(
+				"Vui lòng thử lại."
+			);
+			setTimeout(async () => {
+				await errorMessage.delete();
+			}, 3000);
+		}
 	}
 });
 
